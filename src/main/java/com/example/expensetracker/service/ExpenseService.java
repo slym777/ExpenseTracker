@@ -22,7 +22,7 @@ public class ExpenseService {
         return expenseRepository.findAll();
     }
 
-    public Expense getDebtById(Long expenseId){
+    public Expense getExpenseById(Long expenseId){
         return expenseRepository.findExpenseById(expenseId).orElseThrow(
                 () -> new ResourceNotFoundException("Expense", "expensesId", expenseId));
     }
