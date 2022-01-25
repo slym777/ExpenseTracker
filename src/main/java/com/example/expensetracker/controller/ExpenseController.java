@@ -22,14 +22,20 @@ public class ExpenseController {
         this.expenseService = expenseService;
     }
 
+
+    @GetMapping("/test")
+    public String testConnection() {
+        return "Healthy expense API call!";
+    }
+
     @GetMapping("/allExpenses")
     public List<Expense> getAllExpenses(){
         return expenseService.getAllExpenses();
     }
 
     @GetMapping("/getExpense/{expenseId}")
-    public Expense getDebtById(@PathVariable Long expenseId){
-        return expenseService.getDebtById(expenseId);
+    public Expense getExpenseById(@PathVariable Long expenseId){
+        return expenseService.getExpenseById(expenseId);
     }
 
 }

@@ -15,7 +15,7 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "delete from user_trip ut where user_Id=:userId and hub_Id=:tripId",
+    @Query(value = "delete from user_trip ut where user_Id=:userId and trip_Id=:tripId",
             nativeQuery = true)
     void deleteUserFromHubById(Long userId, Long tripId);
 
