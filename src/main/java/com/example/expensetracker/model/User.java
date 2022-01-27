@@ -56,8 +56,10 @@ public class User {
     private List<Expense> debtorExpenses = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "creditor", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-//    @Where(clause = "settled_up = false")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinTable(name = "user_expense",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "expense_id"))
     private List<Expense> creditorExpenses = new ArrayList<>();
 
     public User() {

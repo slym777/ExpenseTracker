@@ -1,11 +1,15 @@
 package com.example.expensetracker.controller;
 
+import com.example.expensetracker.dtos.CreateTripRequest;
+import com.example.expensetracker.dtos.ExpenseDto;
+import com.example.expensetracker.dtos.TripDto;
 import com.example.expensetracker.model.Trip;
+import com.example.expensetracker.model.User;
 import com.example.expensetracker.service.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,9 +25,25 @@ public class TripController {
     }
 
     @GetMapping("/allTrips")
-    public List<Trip> getAllTrips(){
-        return tripService.getAllTrips();
+    public ResponseEntity<?> getAllTrips(){ return ResponseEntity.ok().body(tripService.getAllTrips()); }
+
+    @GetMapping("/{tripId}")
+    public ResponseEntity<?> getTripById(@PathVariable Long tripId){ return ResponseEntity.ok().body(tripService.getTripById(tripId)); }
+
+    @GetMapping("/userId={userId}")
+    public ResponseEntity<?> getTripsByUserId(@PathVariable Long userId){ return ResponseEntity.ok().body(tripService.getTripsByUserId(userId)); }
+
+    @PostMapping("/saveTrip")
+    public ResponseEntity<?> SaveTrip(@RequestBody CreateTripRequest trip) {
+        tripService.SaveTrip(trip);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
+
+    @PostMapping("/addMember/{tripId}")
+    public ResponseEntity<?> AddMemberToTrip(@PathVariable Long tripId, @RequestBody User user) {return ResponseEntity.ok().body(tripService.AddMember(tripId, user));}
+
+    @PostMapping("/addExpense/{tripId}")
+    public ResponseEntity<?> AddExpenseToTrip(@PathVariable Long tripId, @RequestBody ExpenseDto expenseDto) {return ResponseEntity.ok().body(tripService.AddExpense(tripId, expenseDto));}
 
 //    @GetMapping("/userHubs")
 //    public List<Hub> getUserHubs(@CurrentUser UserPrincipal userPrincipal){
