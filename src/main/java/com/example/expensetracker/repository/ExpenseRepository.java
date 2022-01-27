@@ -1,6 +1,7 @@
 package com.example.expensetracker.repository;
 
 import com.example.expensetracker.model.Expense;
+import com.example.expensetracker.model.Trip;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.Optional;
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     Optional<Expense> findExpenseById(Long id);
     List<Expense> findAll();
+    List<Expense> findExpensesByTrip(Trip trip);
+    Expense save(Expense expense);
 
 //    Optional<Expense> findDebtByIdAndSettledUp(Long id, Boolean settledUp);
 //    List<Expense> findAllByHubIdAndSettledUp(Long hub_id, Boolean settledUp);

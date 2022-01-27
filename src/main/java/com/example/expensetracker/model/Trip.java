@@ -26,19 +26,18 @@ public class Trip {
 
     private Integer groupSize;
 
-    @JsonIgnore
+    //@JsonIgnore
     @ManyToMany(mappedBy = "trips", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    private Set<User> users = new HashSet<>();
+    private List<User> users = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "trip", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-//    @Where(clause = "settled_up = false")
+    //@JsonIgnore
+    @OneToMany(mappedBy = "trip", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private List<Expense> expenses = new ArrayList<>();
 
     public Trip() {
     }
 
-    public Trip(Long id, String name, String description, String avatarUri, String location, Integer groupSize, Set<User> users, List<Expense> expenses) {
+    public Trip(Long id, String name, String description, String avatarUri, String location, Integer groupSize, List<User> users, List<Expense> expenses) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -59,6 +58,10 @@ public class Trip {
         users.remove(user);
         user.getTrips().remove(this);
         groupSize--;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
     }
 
     public Long getId() {
@@ -109,11 +112,11 @@ public class Trip {
         this.groupSize = groupSize;
     }
 
-    public Set<User> getUsers() {
+    public List<User> getUsers() {
         return users;
     }
 
-    public void setUsers(Set<User> users) {
+    public void setUsers(ArrayList<User> users) {
         this.users = users;
     }
 

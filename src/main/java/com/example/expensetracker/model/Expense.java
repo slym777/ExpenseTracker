@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -23,46 +25,40 @@ public class Expense {
     @DecimalMin(value = "0.00", inclusive = false)
     private Double amount;
 
-    @JsonIgnore
+    //@JsonIgnore
     @ManyToOne
     @JoinColumn(name = "debtor_id", nullable = false)
-//    @Where(clause = "settleUp = false")
     private User debtor;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "creditor_id", nullable = false)
-//    @Where(clause = "settleUp = false")
-    private User creditor;
+    //@JsonIgnore
+    @ManyToMany(mappedBy = "creditorExpenses", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    private List<User> creditors = new ArrayList<>();
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "trip_id", nullable = false)
     private Trip trip;
 
-//    @Column(columnDefinition = "boolean default false")
-//    private Boolean settledUp;
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isGroupExpense;
 
 
     public Expense() {
     }
 
-    public Expense(Long id, String description, ExpenseType type, Double amount, User debtor, User creditor, Trip trip) {
+    public Expense(Long id, String description, ExpenseType type, Double amount, User debtor, ArrayList<User> creditors, Trip trip, Boolean isGroupExpense) {
         this.id = id;
         this.description = description;
         this.type = type;
         this.amount = amount;
         this.debtor = debtor;
-        this.creditor = creditor;
+        this.creditors = creditors;
         this.trip = trip;
+        this.isGroupExpense = isGroupExpense;
     }
 
     public void addDebtor(User debtor){
         this.debtor = debtor;
-    }
-
-    public void addCreditor(User creditor){
-        this.creditor = creditor;
     }
 
     public void addTrip(Trip trip){
@@ -109,12 +105,22 @@ public class Expense {
         this.debtor = debtor;
     }
 
-    public User getCreditor() {
-        return creditor;
+    public void addCreditor(User user){
+        creditors.add(user);
+        user.getCreditorExpenses().add(this);
     }
 
-    public void setCreditor(User creditor) {
-        this.creditor = creditor;
+    public void removeCreditor(User user){
+        creditors.remove(user);
+        user.getCreditorExpenses().remove(this);
+    }
+
+    public List<User> getCreditors() {
+        return creditors;
+    }
+
+    public void setCreditors(List<User> creditors) {
+        this.creditors = creditors;
     }
 
     public Trip getTrip() {
@@ -125,16 +131,20 @@ public class Expense {
         this.trip = trip;
     }
 
+    public Boolean getIsGroupExpense() { return isGroupExpense;}
+
+    public void setIsGroupExpense(Boolean groupExpense) { isGroupExpense = groupExpense;}
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Expense expense = (Expense) o;
-        return id.equals(expense.id) && Objects.equals(description, expense.description) && type == expense.type && amount.equals(expense.amount) && Objects.equals(debtor, expense.debtor) && Objects.equals(creditor, expense.creditor) && Objects.equals(trip, expense.trip);
+        return id.equals(expense.id) && Objects.equals(description, expense.description) && type == expense.type && amount.equals(expense.amount) && Objects.equals(debtor, expense.debtor) && Objects.equals(creditors, expense.creditors) && Objects.equals(trip, expense.trip);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, description, type, amount, debtor, creditor, trip);
+        return Objects.hash(id, description, type, amount, debtor, creditors, trip);
     }
 }

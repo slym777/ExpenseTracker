@@ -1,6 +1,7 @@
 package com.example.expensetracker.repository;
 
 import com.example.expensetracker.model.Trip;
+import com.example.expensetracker.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +12,13 @@ import java.util.Optional;
 
 public interface TripRepository extends JpaRepository<Trip, Long> {
     Optional<Trip> findGroupById(Long id);
+    List<Trip> findAllByUsersIsContaining(User user);
     List<Trip> findAll();
+    Optional<Trip> findTripById(Long id);
+
+    @Override
+    @Transactional
+    Trip save(Trip trip);
 
     @Modifying
     @Transactional
