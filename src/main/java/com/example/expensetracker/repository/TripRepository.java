@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TripRepository extends JpaRepository<Trip, Long> {
-    Optional<Trip> findGroupById(Long id);
     List<Trip> findAllByUsersIsContaining(User user);
     List<Trip> findAll();
     Optional<Trip> findTripById(Long id);

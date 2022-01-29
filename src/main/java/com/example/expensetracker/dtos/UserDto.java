@@ -1,26 +1,20 @@
-package com.example.expensetracker.model;
+package com.example.expensetracker.dtos;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.expensetracker.model.Expense;
+import com.example.expensetracker.model.Trip;
+import com.example.expensetracker.model.User;
+import com.googlecode.jmapper.annotations.JGlobalMap;
 import org.hibernate.annotations.NaturalId;
 
-import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-@Entity
-@Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "email"
-        })
-})
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@JGlobalMap
+public class UserDto {
     private Long id;
 
     @NotBlank
@@ -38,36 +32,22 @@ public class User {
 
     private String avatarUri;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinTable(name = "user_trip",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "trip_id"))
     private List<Trip> trips = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "debtor", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-//    @Where(clause = "settled_up = false")
     private List<Expense> debtorExpenses = new ArrayList<>();
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-    @JoinTable(name = "user_expense",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "expense_id"))
     private List<Expense> creditorExpenses = new ArrayList<>();
 
-    public User() {
-    }
+    public UserDto() { }
 
-    public User(String fullName, String email, String phoneNumber, String avatarUri) {
+    public UserDto(String fullName, String email, String phoneNumber, String avatarUri) {
         this.fullName = fullName;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.avatarUri = avatarUri;
     }
 
-    public User(Long id, String fullName, String email, String phoneNumber, String avatarUri, List<Trip> trips, List<Expense> debtorExpenses, List<Expense> creditorExpenses) {
+    public UserDto(Long id, String fullName, String email, String phoneNumber, String avatarUri, List<Trip> trips, List<Expense> debtorExpenses, List<Expense> creditorExpenses) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
@@ -140,18 +120,5 @@ public class User {
 
     public void setCreditorExpenses(List<Expense> creditorExpenses) {
         this.creditorExpenses = creditorExpenses;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(fullName, user.fullName) && Objects.equals(email, user.email) && Objects.equals(phoneNumber, user.phoneNumber) && Objects.equals(avatarUri, user.avatarUri) && Objects.equals(trips, user.trips) && Objects.equals(debtorExpenses, user.debtorExpenses) && Objects.equals(creditorExpenses, user.creditorExpenses);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, fullName, email, phoneNumber);
     }
 }
