@@ -60,10 +60,6 @@ public class Trip {
         groupSize--;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
     public Long getId() {
         return id;
     }
