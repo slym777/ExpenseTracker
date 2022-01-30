@@ -1,25 +1,24 @@
 package com.example.expensetracker.controller;
 
 import com.example.expensetracker.dtos.UserDto;
-import com.example.expensetracker.model.User;
-import com.example.expensetracker.repository.UserRepository;
-import com.example.expensetracker.service.TripService;
+import com.example.expensetracker.service.NotificationService;
 import com.example.expensetracker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final NotificationService notificationService;
 
     @Autowired
-    public UserController(UserService userService) { this.userService = userService; }
+    public UserController(UserService userService, NotificationService notificationService) { this.userService = userService;
+        this.notificationService = notificationService;
+    }
 
     @GetMapping("/allUsers")
     public ResponseEntity<?> getAllUsers(){
@@ -34,6 +33,11 @@ public class UserController {
     @GetMapping("/userEmail={userEmail}")
     public ResponseEntity<?> getUserByEmail(@PathVariable String userEmail) {
         return ResponseEntity.ok().body(userService.getUserByEmail(userEmail));
+    }
+
+    @GetMapping("/{userId}/getNotifications")
+    public ResponseEntity<?> getNotificationForUser(@PathVariable Long userId) {
+        return ResponseEntity.ok().body(notificationService.GetNotificationsForUser(userId));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
