@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseService {
@@ -22,9 +24,16 @@ public class ExpenseService {
         return expenseRepository.findAll();
     }
 
-    public Expense getExpenseById(Long expenseId){
+    public Expense getExpenseById(Long expenseId) {
         return expenseRepository.findExpenseById(expenseId).orElseThrow(
                 () -> new ResourceNotFoundException("Expense", "expensesId", expenseId));
+    }
+
+    public List<Expense> getTripExpensesByTripId(Long tripId, Boolean isGroup) {
+        return expenseRepository.findAll().stream()
+                .filter(e -> Objects.equals(e.getIsGroupExpense(), isGroup))
+                .filter(e -> Objects.equals(e.getTrip().getId(), tripId))
+                .collect(Collectors.toList());
     }
 
 

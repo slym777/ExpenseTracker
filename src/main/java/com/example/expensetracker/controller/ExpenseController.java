@@ -38,4 +38,9 @@ public class ExpenseController {
         return expenseService.getExpenseById(expenseId);
     }
 
+    @GetMapping("/getTripExpenses/{tripId}/{isGroup}")
+    public List<Expense> getTripExpensesByTripId(@PathVariable Long tripId, @PathVariable Boolean isGroup){
+        return expenseService.getTripExpensesByTripId(tripId, isGroup);
+    }
+
 }
