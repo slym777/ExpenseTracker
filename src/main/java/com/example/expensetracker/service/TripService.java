@@ -15,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,12 +25,14 @@ public class TripService {
     private final TripRepository tripRepository;
     private ExpenseRepository expenseRepository;
     private UserRepository userRepository;
+    private NotificationService notificationService;
 
     @Autowired
-    public TripService(TripRepository tripRepository, ExpenseRepository expenseRepository, UserRepository userRepository) {
+    public TripService(TripRepository tripRepository, ExpenseRepository expenseRepository, UserRepository userRepository, NotificationService notificationService) {
         this.tripRepository = tripRepository;
         this.expenseRepository = expenseRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     public TripDto getTripById(Long tripId) {
@@ -84,6 +84,9 @@ public class TripService {
         trip.addUser(userRepository.findUserById(user.getId()).orElseThrow(
                 () -> new ResourceNotFoundException("User", "userId", user.getId())));
         var tripUpdated = tripRepository.save(trip);
+
+        notificationService.CreateNotificationForTrip(user, tripUpdated);
+
         JMapper<TripDto, Trip> tripMapperToDto= new JMapper<>(
                 TripDto.class, Trip.class);
         var x= tripMapperToDto.getDestination(tripUpdated);
@@ -128,10 +131,15 @@ public class TripService {
                 () -> new ResourceNotFoundException("Trip", "tripId", tripId));
         var expense = expenseMapper.getDestination(expenseDto);
         expense.setTrip(trip);
+        expense.setDebtor(userRepository.findUserById(expenseDto.getDebtor().getId()).orElseThrow(
+                () -> new ResourceNotFoundException("User", "userId", expenseDto.getDebtor().getId())));
         expense.setCreditors(new ArrayList<>());
         var creditors = new ArrayList<>(expenseDto.getCreditors());
         creditors.forEach(us -> expense.addCreditor(userRepository.findUserById(us.getId()).get()));
+
         expenseRepository.save(expense);
+        if(expense.getIsGroupExpense()) notificationService.CreateNotificationsForGroupExpense(expense);
+
         trip.getExpenses().add(expense);
         return tripMapper.getDestination(trip);
     }
