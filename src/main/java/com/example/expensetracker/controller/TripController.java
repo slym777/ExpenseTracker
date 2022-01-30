@@ -42,9 +42,14 @@ public class TripController {
     @PostMapping("/addMember/{tripId}")
     public ResponseEntity<?> AddMemberToTrip(@PathVariable Long tripId, @RequestBody User user) {return ResponseEntity.ok().body(tripService.AddMember(tripId, user));}
 
+    @DeleteMapping("/deleteMember/{tripId}")
+    public ResponseEntity<?> DeleteMemberFromTrip(@PathVariable Long tripId, @RequestBody User user) {return ResponseEntity.ok().body(tripService.DeleteMember(tripId, user));}
+
     @PostMapping("/addExpense/{tripId}")
     public ResponseEntity<?> AddExpenseToTrip(@PathVariable Long tripId, @RequestBody ExpenseDto expenseDto) {return ResponseEntity.ok().body(tripService.AddExpense(tripId, expenseDto));}
 
+    @DeleteMapping("/deleteExpense/{tripId}")
+    public ResponseEntity<?> DeleteExpenseFromTrip(@PathVariable Long tripId, @RequestBody ExpenseDto expenseDto) {return ResponseEntity.ok().body(tripService.DeleteExpense(tripId, expenseDto));}
 //    @GetMapping("/userHubs")
 //    public List<Hub> getUserHubs(@CurrentUser UserPrincipal userPrincipal){
 //        User user = userRepository.findUserById(userPrincipal.getId()).orElseThrow(
