@@ -27,10 +27,11 @@ public class User {
     @Size(max = 40)
     private String fullName;
 
-    @NaturalId
+    @NaturalId(mutable=true)
     @NotBlank
     @Size(max = 40)
     @Email
+    @Column(unique = true)
     private String email;
 
     @Pattern(regexp = "(^$|[0-9]{10})")

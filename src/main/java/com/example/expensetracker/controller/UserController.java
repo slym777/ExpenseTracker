@@ -47,6 +47,12 @@ public class UserController {
         return new ResponseEntity<>(savedUserDto, HttpStatus.CREATED);
     }
 
+    @PostMapping("/edit/userId={userId}")
+    public ResponseEntity<UserDto> saveTrip(@PathVariable Long userId, @RequestBody UserDto userDto) {
+        var updatedUserDto = userService.updateUser(userId, userDto);
+        return new ResponseEntity<>(updatedUserDto, HttpStatus.OK);
+    }
+
 // public ResponseEntity<?> getTripById(@PathVariable Long tripId){ return ResponseEntity.ok().body(tripService.getTripById(tripId)); }
 //
 //    @Autowired
