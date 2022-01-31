@@ -53,4 +53,10 @@ public class NotificationService {
                 () -> new ResourceNotFoundException("Notification", "notificationId", notificationId));
         notificationRepository.delete(notification);
     }
+
+    public void DeleteNotificationsForTrip(Long tripId)
+    {
+        var notifications = notificationRepository.findAll().stream().filter(n ->  n.getTrip().getId() == tripId).collect(Collectors.toList());
+        notificationRepository.deleteAll(notifications);
+    }
 }

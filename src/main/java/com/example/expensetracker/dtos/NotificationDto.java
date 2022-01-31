@@ -4,6 +4,8 @@ import com.example.expensetracker.model.ActionType;
 import com.example.expensetracker.model.User;
 import com.googlecode.jmapper.annotations.JGlobalMap;
 
+import java.util.Date;
+
 @JGlobalMap
 public class NotificationDto {
     private Long id;
@@ -13,6 +15,8 @@ public class NotificationDto {
     private ActionType type;
 
     private User user;
+
+    private Date createdDate;
 
     public NotificationDto(Long id, String description, User user) {
         this.id = id;
@@ -53,5 +57,13 @@ public class NotificationDto {
 
     public void setType(ActionType type) {
         this.type = type;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 }

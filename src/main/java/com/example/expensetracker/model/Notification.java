@@ -1,8 +1,11 @@
 package com.example.expensetracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.util.Date;
 
 @Entity
 @Table(name = "notifications")
@@ -25,6 +28,11 @@ public class Notification {
     @ManyToOne
     @JoinColumn(name = "trip_id", nullable = false)
     private Trip trip;
+
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column
+    private Date createdDate;
 
     public Notification(String description, ActionType type, User user, Trip trip) {
         this.description = description;
@@ -74,5 +82,9 @@ public class Notification {
 
     public void setTrip(Trip trip) {
         this.trip = trip;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
     }
 }

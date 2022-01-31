@@ -10,6 +10,7 @@ import com.example.expensetracker.model.User;
 import com.example.expensetracker.repository.ExpenseRepository;
 import com.example.expensetracker.repository.TripRepository;
 import com.example.expensetracker.repository.UserRepository;
+import com.example.expensetracker.utils.Helpers;
 import com.googlecode.jmapper.JMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -76,6 +77,20 @@ public class TripService {
                     () -> new ResourceNotFoundException("User", "userId", us.getId())));
         });
         tripRepository.save(trip);
+    }
+
+    public TripDto UpdateTrip(TripDto tripDto) {
+        JMapper<TripDto, Trip> tripMapper= new JMapper<>(
+                TripDto.class, Trip.class);
+        var trip = tripRepository.findTripById(tripDto.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("Trip", "tripId", tripDto.getId()));
+        if(!Helpers.IsNullOrEmpty(tripDto.getAvatarUri()) && tripDto.getAvatarUri() != trip.getAvatarUri()) trip.setAvatarUri(tripDto.getAvatarUri());
+        if(!Helpers.IsNullOrEmpty(tripDto.getDescription()) &&tripDto.getDescription() != trip.getDescription()) trip.setDescription(tripDto.getDescription());
+        if(!Helpers.IsNullOrEmpty(tripDto.getLocation()) &&tripDto.getLocation() != trip.getLocation()) trip.setLocation(tripDto.getLocation());
+        if(!Helpers.IsNullOrEmpty(tripDto.getName()) &&tripDto.getName() != trip.getName()) trip.setName(tripDto.getName());
+
+        tripRepository.save(trip);
+        return tripMapper.getDestination(trip);
     }
 
     public TripDto AddMember(Long tripId, User user) {
@@ -153,10 +168,30 @@ public class TripService {
         var expense = expenseRepository.findExpenseById(expenseDto.getId()).orElseThrow(
                 () -> new ResourceNotFoundException("Expense", "expenseId", expenseDto.getId()));
         expense.setTrip(trip);
-        var creditors = new ArrayList<>(expense.getCreditors());
-        creditors.forEach(us -> expense.removeCreditor(userRepository.findUserById(us.getId()).get()));
+        RemoveCreditors(expense);
         trip.getExpenses().remove(expense);
         expenseRepository.delete(expense);
         return tripMapper.getDestination(trip);
     }
+
+    public void DeleteTrip(Long tripId){
+        var trip = tripRepository.findTripById(tripId).orElseThrow(
+                () -> new ResourceNotFoundException("Trip", "tripId", tripId));
+        var members = trip.getUsers();
+        var expenses = trip.getExpenses();
+        members.forEach(m -> m.getTrips().remove(trip));
+        expenses.forEach(e -> {
+            RemoveCreditors(e);
+            expenseRepository.delete(e);
+        });
+        notificationService.DeleteNotificationsForTrip(tripId);
+        tripRepository.delete(trip);
+    }
+
+    private void RemoveCreditors(Expense expense)
+    {
+        var creditors = new ArrayList<>(expense.getCreditors());
+        creditors.forEach(us -> expense.removeCreditor(userRepository.findUserById(us.getId()).get()));
+    }
+
 }
