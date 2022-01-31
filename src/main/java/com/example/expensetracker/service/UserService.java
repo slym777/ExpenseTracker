@@ -3,6 +3,7 @@ package com.example.expensetracker.service;
 import com.example.expensetracker.dtos.TripDto;
 import com.example.expensetracker.dtos.UserDto;
 import com.example.expensetracker.exception.ResourceExistsException;
+import com.example.expensetracker.exception.ResourceNotFoundException;
 import com.example.expensetracker.model.Trip;
 import com.example.expensetracker.model.User;
 import com.example.expensetracker.repository.UserRepository;
@@ -47,6 +48,27 @@ public class UserService {
         var usersDto = new ArrayList<UserDto>();
         users.forEach(u -> usersDto.add(userMapper.getDestination(u)));
         return usersDto;
+    }
+
+    public UserDto updateUser(Long userId, UserDto userDto) {
+        JMapper<User, UserDto> userMapper= new JMapper<>(
+                User.class, UserDto.class);
+
+        var user = userMapper.getDestination(userDto);
+
+        var dbUser = userRepository.findUserById(userId).orElseThrow( () ->
+                new ResourceNotFoundException("User", "userId", userId)
+        );
+
+        dbUser.setFullName(user.getFullName());
+        dbUser.setEmail(user.getEmail());
+        dbUser.setPhoneNumber(user.getPhoneNumber());
+        dbUser.setAvatarUri(user.getAvatarUri());
+
+        var updatedUser = userRepository.save(dbUser);
+        JMapper<UserDto, User> userMapperBack = new JMapper<>(
+                UserDto.class, User.class);
+        return userMapperBack.getDestination(updatedUser);
     }
 
     public UserDto saveUser(UserDto userDto) {
