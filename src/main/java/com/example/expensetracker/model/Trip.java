@@ -1,11 +1,11 @@
 package com.example.expensetracker.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "trips")
@@ -112,7 +112,7 @@ public class Trip {
         return users;
     }
 
-    public void setUsers(ArrayList<User> users) {
+    public void setUsers(List<User> users) {
         this.users = users;
     }
 

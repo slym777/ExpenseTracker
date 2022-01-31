@@ -2,6 +2,7 @@ package com.example.expensetracker.service;
 
 import com.example.expensetracker.dtos.CreateTripRequest;
 import com.example.expensetracker.dtos.ExpenseDto;
+import com.example.expensetracker.dtos.PushNotificationRequest;
 import com.example.expensetracker.dtos.TripDto;
 import com.example.expensetracker.exception.ResourceNotFoundException;
 import com.example.expensetracker.model.Expense;
@@ -27,13 +28,16 @@ public class TripService {
     private ExpenseRepository expenseRepository;
     private UserRepository userRepository;
     private NotificationService notificationService;
+    private PushNotificationService pushNotificationService;
 
     @Autowired
-    public TripService(TripRepository tripRepository, ExpenseRepository expenseRepository, UserRepository userRepository, NotificationService notificationService) {
+    public TripService(TripRepository tripRepository, ExpenseRepository expenseRepository, UserRepository userRepository,
+                       NotificationService notificationService, PushNotificationService pushNotificationService) {
         this.tripRepository = tripRepository;
         this.expenseRepository = expenseRepository;
         this.userRepository = userRepository;
         this.notificationService = notificationService;
+        this.pushNotificationService = pushNotificationService;
     }
 
     public TripDto getTripById(Long tripId) {
@@ -75,6 +79,7 @@ public class TripService {
         users.forEach(us -> {
             trip.addUser(userRepository.findUserById(us.getId()).orElseThrow(
                     () -> new ResourceNotFoundException("User", "userId", us.getId())));
+            pushNotificationService.createAddUserToTripNotification(us.getId(), trip.getName());
         });
         tripRepository.save(trip);
     }
