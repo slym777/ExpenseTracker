@@ -97,8 +97,6 @@ public class PushNotificationService {
                 .setMessage(defaults.get("message")).
                 setTopic( defaults.get("topic")).build();
     }
-
-
 }
 
 

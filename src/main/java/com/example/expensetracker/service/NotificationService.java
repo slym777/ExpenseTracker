@@ -9,6 +9,7 @@ import com.googlecode.jmapper.JMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,7 +46,11 @@ public class NotificationService {
                 NotificationDto.class, Notification.class);
         var user = userRepository.findUserById(userId).orElseThrow(
             () -> new ResourceNotFoundException("User", "userId", userId));
-        return notificationRepository.findAllByUser(user).stream().map(notificationMapper::getDestination).collect(Collectors.toList());
+        return notificationRepository.findAllByUser(user)
+                .stream()
+                .map(notificationMapper::getDestination)
+                .sorted((ob1, ob2) -> ob2.getCreatedDate().compareTo(ob1.getCreatedDate()))
+                .collect(Collectors.toList());
     }
     public void DeleteNotification(Long notificationId)
     {

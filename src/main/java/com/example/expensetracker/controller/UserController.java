@@ -42,13 +42,13 @@ public class UserController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/saveUser")
-    public ResponseEntity<UserDto> saveTrip(@RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> saveUser(@RequestBody UserDto userDto) {
         var savedUserDto = userService.saveUser(userDto);
         return new ResponseEntity<>(savedUserDto, HttpStatus.CREATED);
     }
 
     @PostMapping("/edit/userId={userId}")
-    public ResponseEntity<UserDto> saveTrip(@PathVariable Long userId, @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
         var updatedUserDto = userService.updateUser(userId, userDto);
         return new ResponseEntity<>(updatedUserDto, HttpStatus.OK);
     }
