@@ -79,9 +79,14 @@ public class TripService {
         users.forEach(us -> {
             trip.addUser(userRepository.findUserById(us.getId()).orElseThrow(
                     () -> new ResourceNotFoundException("User", "userId", us.getId())));
-            pushNotificationService.createAddUserToTripNotification(us.getId(), trip.getName());
         });
+
         tripRepository.save(trip);
+
+        users.forEach(us -> {
+            pushNotificationService.createAddUserToTripNotification(us.getId(), trip.getName());
+            notificationService.CreateNotificationForTrip(us, trip);
+        });
     }
 
     public TripDto UpdateTrip(TripDto tripDto) {

@@ -5,6 +5,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -39,6 +40,7 @@ public class Notification {
         this.type = type;
         this.user = user;
         this.trip = trip;
+        this.createdDate = Date.from(Instant.now());
     }
 
     public Notification() {
