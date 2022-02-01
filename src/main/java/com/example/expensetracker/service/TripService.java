@@ -16,7 +16,9 @@ import com.googlecode.jmapper.JMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,6 +102,7 @@ public class TripService {
         if(!Helpers.IsNullOrEmpty(tripDto.getName()) &&tripDto.getName() != trip.getName()) trip.setName(tripDto.getName());
 
         tripRepository.save(trip);
+
         return tripMapper.getDestination(trip);
     }
 
@@ -162,6 +165,7 @@ public class TripService {
         var creditors = new ArrayList<>(expenseDto.getCreditors());
         creditors.forEach(us -> expense.addCreditor(userRepository.findUserById(us.getId()).get()));
 
+        expense.setCreatedDate(Date.from(Instant.now()));
         expenseRepository.save(expense);
         if(expense.getIsGroupExpense()) notificationService.CreateNotificationsForGroupExpense(expense);
 
