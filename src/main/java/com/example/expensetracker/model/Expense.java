@@ -1,11 +1,14 @@
 package com.example.expensetracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,6 +45,10 @@ public class Expense {
     @Column(columnDefinition = "boolean default false")
     private Boolean isGroupExpense;
 
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column
+    private Date createdDate;
 
     public Expense() {
     }
@@ -55,6 +62,7 @@ public class Expense {
         this.creditors = creditors;
         this.trip = trip;
         this.isGroupExpense = isGroupExpense;
+        this.createdDate = Date.from(Instant.now());
     }
 
     public void addDebtor(User debtor){
@@ -134,6 +142,8 @@ public class Expense {
     public Boolean getIsGroupExpense() { return isGroupExpense;}
 
     public void setIsGroupExpense(Boolean groupExpense) { isGroupExpense = groupExpense;}
+
+
 
     @Override
     public boolean equals(Object o) {

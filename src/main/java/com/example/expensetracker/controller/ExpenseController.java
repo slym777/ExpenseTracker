@@ -4,6 +4,7 @@ package com.example.expensetracker.controller;
 import com.example.expensetracker.model.Expense;
 import com.example.expensetracker.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +42,11 @@ public class ExpenseController {
     @GetMapping("/getTripExpenses/{tripId}/{isGroup}")
     public List<Expense> getTripExpensesByTripId(@PathVariable Long tripId, @PathVariable Boolean isGroup){
         return expenseService.getTripExpensesByTripId(tripId, isGroup);
+    }
+
+    @GetMapping("/getCreditorExpenses/{userId}")
+    public ResponseEntity<?> getCreditorExpensesByUserId(@PathVariable Long userId){
+        return ResponseEntity.ok().body(expenseService.getCreditorExpenses(userId));
     }
 
 }
