@@ -91,11 +91,11 @@ public class TripService {
         });
     }
 
-    public TripDto UpdateTrip(TripDto tripDto) {
+    public TripDto UpdateTrip(Long tripId, TripDto tripDto) {
         JMapper<TripDto, Trip> tripMapper= new JMapper<>(
                 TripDto.class, Trip.class);
-        var trip = tripRepository.findTripById(tripDto.getId()).orElseThrow(
-                () -> new ResourceNotFoundException("Trip", "tripId", tripDto.getId()));
+        var trip = tripRepository.findTripById(tripId).orElseThrow(
+                () -> new ResourceNotFoundException("Trip", "tripId", tripId));
         if(!Helpers.IsNullOrEmpty(tripDto.getAvatarUri()) && tripDto.getAvatarUri() != trip.getAvatarUri()) trip.setAvatarUri(tripDto.getAvatarUri());
         if(!Helpers.IsNullOrEmpty(tripDto.getDescription()) &&tripDto.getDescription() != trip.getDescription()) trip.setDescription(tripDto.getDescription());
         if(!Helpers.IsNullOrEmpty(tripDto.getLocation()) &&tripDto.getLocation() != trip.getLocation()) trip.setLocation(tripDto.getLocation());
@@ -103,6 +103,18 @@ public class TripService {
 
         tripRepository.save(trip);
 
+        var savedUsers = trip.getUsers();
+        var incomingUsers = tripDto.getUsers();
+
+        var toBeDeleted = new ArrayList<>(savedUsers);
+        toBeDeleted.removeAll(incomingUsers);
+        toBeDeleted.forEach(user -> DeleteMember(tripId, user));
+
+        var toBeAdded = new ArrayList<>(incomingUsers);
+        toBeAdded.removeAll(savedUsers);
+        toBeAdded.forEach(user -> AddMember(tripId, user));
+
+        trip.setUsers(incomingUsers);
         return tripMapper.getDestination(trip);
     }
 

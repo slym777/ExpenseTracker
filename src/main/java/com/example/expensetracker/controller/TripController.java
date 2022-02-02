@@ -3,15 +3,12 @@ package com.example.expensetracker.controller;
 import com.example.expensetracker.dtos.CreateTripRequest;
 import com.example.expensetracker.dtos.ExpenseDto;
 import com.example.expensetracker.dtos.TripDto;
-import com.example.expensetracker.model.Trip;
 import com.example.expensetracker.model.User;
 import com.example.expensetracker.service.TripService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/trips")
@@ -44,8 +41,8 @@ public class TripController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/updateTrip")
-    public ResponseEntity<?> UpdateTrip(@RequestBody TripDto tripDto) {return ResponseEntity.ok().body(tripService.UpdateTrip(tripDto));}
+    @PutMapping("/updateTrip/{tripId}")
+    public ResponseEntity<?> UpdateTrip(@PathVariable Long tripId, @RequestBody TripDto tripDto) {return ResponseEntity.ok().body(tripService.UpdateTrip(tripId, tripDto));}
 
     @PostMapping("/addMember/{tripId}")
     public ResponseEntity<?> AddMemberToTrip(@PathVariable Long tripId, @RequestBody User user) {return ResponseEntity.ok().body(tripService.AddMember(tripId, user));}
