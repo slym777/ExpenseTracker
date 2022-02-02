@@ -1,14 +1,13 @@
 package com.example.expensetracker.controller;
 
 
+import com.example.expensetracker.dtos.ExpenseDto;
 import com.example.expensetracker.model.Expense;
 import com.example.expensetracker.service.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,6 +36,12 @@ public class ExpenseController {
     @GetMapping("/getExpense/{expenseId}")
     public Expense getExpenseById(@PathVariable Long expenseId){
         return expenseService.getExpenseById(expenseId);
+    }
+
+    @DeleteMapping("/delete/{expenseId}")
+    public ResponseEntity<?> deleteExpense(@PathVariable Long expenseId) {
+        expenseService.DeleteExpense(expenseId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/getTripExpenses/{tripId}/{isGroup}")

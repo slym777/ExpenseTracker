@@ -106,16 +106,41 @@ public class TripService {
         var savedUsers = trip.getUsers();
         var incomingUsers = tripDto.getUsers();
 
-        var toBeDeleted = new ArrayList<>(savedUsers);
-        toBeDeleted.removeAll(incomingUsers);
+        List<User> toBeDeleted = new ArrayList<>();
+        for(var savedUser: savedUsers) {
+            boolean isPresent = false;
+            for (var incomingUser : incomingUsers) {
+                if (savedUser.getEmail().equals(incomingUser.getEmail())) {
+                    isPresent = true;
+                    break;
+                }
+            }
+
+            if (!isPresent) {
+                toBeDeleted.add(savedUser);
+            }
+        }
+
         toBeDeleted.forEach(user -> DeleteMember(tripId, user));
 
-        var toBeAdded = new ArrayList<>(incomingUsers);
-        toBeAdded.removeAll(savedUsers);
+        List<User> toBeAdded = new ArrayList<>();
+        for(var incomingUser: incomingUsers) {
+            boolean isPresent = false;
+            for (var savedUser : savedUsers) {
+                if (savedUser.getEmail().equals(incomingUser.getEmail())) {
+                    isPresent = true;
+                    break;
+                }
+            }
+
+            if (!isPresent) {
+                toBeAdded.add(incomingUser);
+            }
+        }
+
         toBeAdded.forEach(user -> AddMember(tripId, user));
 
-        trip.setUsers(incomingUsers);
-        return tripMapper.getDestination(trip);
+        return getTripById(tripId);
     }
 
     public TripDto AddMember(Long tripId, User user) {
