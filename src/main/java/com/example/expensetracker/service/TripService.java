@@ -175,7 +175,8 @@ public class TripService {
                 () -> new ResourceNotFoundException("User", "userId", expenseDto.getDebtor().getId())));
         expense.setCreditors(new ArrayList<>());
         var creditors = new ArrayList<>(expenseDto.getCreditors());
-        creditors.forEach(us -> expense.addCreditor(userRepository.findUserById(us.getId()).get()));
+        creditors.forEach(us -> expense.addCreditor(userRepository.findUserById(us.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("User", "userId", us.getId()))));
 
         expense.setCreatedDate(Date.from(Instant.now()));
         expenseRepository.save(expense);
