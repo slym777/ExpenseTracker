@@ -8,6 +8,7 @@ import com.example.expensetracker.model.Trip;
 import com.example.expensetracker.repository.ExpenseRepository;
 import com.example.expensetracker.repository.TripRepository;
 import com.example.expensetracker.repository.UserRepository;
+import com.example.expensetracker.utils.Helpers;
 import com.googlecode.jmapper.JMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,26 @@ public class ExpenseService {
                 .filter(e -> Objects.equals(e.getIsGroupExpense(), isGroup))
                 .filter(e -> Objects.equals(e.getTrip().getId(), tripId))
                 .collect(Collectors.toList());
+    }
+
+    public ExpenseDto editExpense(Long expenseId, ExpenseDto expenseDto) {
+        JMapper<ExpenseDto, Expense> tripMapper= new JMapper<>(
+                ExpenseDto.class, Expense.class);
+        var expense = expenseRepository.findExpenseById(expenseId).orElseThrow(
+                () -> new ResourceNotFoundException("Expense", "expenseId", expenseId));
+
+        if (!Helpers.IsNullOrEmpty(expenseDto.getAmount().toString()) && !Objects.equals(expenseDto.getAmount(), expense.getAmount())) {
+            expense.setAmount(expenseDto.getAmount());
+        }
+        if (!Helpers.IsNullOrEmpty(expenseDto.getDescription()) && !Objects.equals(expenseDto.getDescription(), expense.getDescription())) {
+            expense.setDescription(expenseDto.getDescription());
+        }
+        if (!Helpers.IsNullOrEmpty(expenseDto.getType().name()) && !Objects.equals(expenseDto.getType(), expense.getType())) {
+            expense.setType(expenseDto.getType());
+        }
+
+        expenseRepository.save(expense);
+        return tripMapper.getDestination(getExpenseById(expenseId));
     }
 
     public void DeleteExpense(Long expenseId) {
