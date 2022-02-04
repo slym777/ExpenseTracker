@@ -80,7 +80,12 @@ public class ExpenseService {
     public List<Expense> getCreditorExpenses(Long userId) {
         var user = userRepository.findUserById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("User", "userId", userId));
-        return user.getCreditorExpenses();
+        var personalExpenses = expenseRepository.getUsersPersonalExpenses(userId);
+        // all group expenses where curent user is a contributor
+        var allUserExpenses = user.getCreditorExpenses();
+        // all personal expenses
+        allUserExpenses.addAll(personalExpenses);
+        return allUserExpenses;
     }
 
     private void removeCreditors(Expense expense)
