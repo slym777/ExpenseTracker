@@ -2,10 +2,10 @@ package com.example.expensetracker.dtos;
 
 import com.example.expensetracker.model.Expense;
 import com.example.expensetracker.model.Trip;
-import com.example.expensetracker.model.User;
 import com.googlecode.jmapper.annotations.JGlobalMap;
 import org.hibernate.annotations.NaturalId;
 
+import javax.persistence.Column;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -21,10 +21,11 @@ public class UserDto {
     @Size(max = 40)
     private String fullName;
 
-    @NaturalId
+    @NaturalId(mutable=true)
     @NotBlank
     @Size(max = 40)
     @Email
+    @Column(unique = true)
     private String email;
 
     @Pattern(regexp = "(^$|[0-9]{10})")

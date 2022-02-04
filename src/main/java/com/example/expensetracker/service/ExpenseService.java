@@ -1,10 +1,8 @@
 package com.example.expensetracker.service;
 
 import com.example.expensetracker.dtos.ExpenseDto;
-import com.example.expensetracker.dtos.TripDto;
 import com.example.expensetracker.exception.ResourceNotFoundException;
 import com.example.expensetracker.model.Expense;
-import com.example.expensetracker.model.Trip;
 import com.example.expensetracker.repository.ExpenseRepository;
 import com.example.expensetracker.repository.TripRepository;
 import com.example.expensetracker.repository.UserRepository;
@@ -20,7 +18,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class ExpenseService {
-
     private final ExpenseRepository expenseRepository;
     private final UserRepository userRepository;
     private final TripRepository tripRepository;
@@ -68,14 +65,14 @@ public class ExpenseService {
         return tripMapper.getDestination(getExpenseById(expenseId));
     }
 
-    public void DeleteExpense(Long expenseId) {
+    public void deleteExpense(Long expenseId) {
         var expense = expenseRepository.findExpenseById(expenseId).orElseThrow(
                 () -> new ResourceNotFoundException("Expense", "expenseId", expenseId));
 
         var trip = tripRepository.findTripById(expense.getTrip().getId()).orElseThrow(
                 () -> new ResourceNotFoundException("Trip", "tripId", expense.getTrip().getId()));
         expense.setTrip(trip);
-        RemoveCreditors(expense);
+        removeCreditors(expense);
         trip.getExpenses().remove(expense);
         expenseRepository.delete(expense);
     }
@@ -86,7 +83,7 @@ public class ExpenseService {
         return user.getCreditorExpenses();
     }
 
-    private void RemoveCreditors(Expense expense)
+    private void removeCreditors(Expense expense)
     {
         var creditors = new ArrayList<>(expense.getCreditors());
         creditors.forEach(us -> expense.removeCreditor(userRepository.findUserById(us.getId()).orElseThrow(

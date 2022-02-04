@@ -1,7 +1,6 @@
 package com.example.expensetracker.dtos;
 
 import com.example.expensetracker.model.User;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.googlecode.jmapper.annotations.JGlobalMap;
 
 import javax.validation.constraints.NotBlank;

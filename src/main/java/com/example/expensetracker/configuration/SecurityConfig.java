@@ -1,4 +1,4 @@
-package com.example.expensetracker.config;
+package com.example.expensetracker.configuration;
 
 import com.example.expensetracker.auth.SecurityFilter;
 import com.example.expensetracker.auth.models.SecurityProperties;
@@ -28,14 +28,18 @@ import java.util.Map;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private SecurityProperties securityProperties;
+    private final SecurityProperties securityProperties;
 
-    @Autowired
     public SecurityFilter tokenAuthenticationFilter;
+
+    @Autowired
+    public SecurityConfig(ObjectMapper objectMapper, SecurityProperties securityProperties, SecurityFilter tokenAuthenticationFilter) {
+        this.objectMapper = objectMapper;
+        this.securityProperties = securityProperties;
+        this.tokenAuthenticationFilter = tokenAuthenticationFilter;
+    }
 
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {

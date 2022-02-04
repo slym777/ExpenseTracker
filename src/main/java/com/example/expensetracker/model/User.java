@@ -48,7 +48,6 @@ public class User {
 
     @JsonIgnore
     @OneToMany(mappedBy = "debtor", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
-//    @Where(clause = "settled_up = false")
     private List<Expense> debtorExpenses = new ArrayList<>();
 
     @JsonIgnore

@@ -23,14 +23,18 @@ import java.io.IOException;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
-    @Autowired
     SecurityService securityService;
 
-    @Autowired
     SecurityProperties securityProperties;
 
-    @Autowired
     CookieUtils cookieUtils;
+
+    @Autowired
+    public SecurityFilter(SecurityService securityService, SecurityProperties securityProperties, CookieUtils cookieUtils) {
+        this.securityService = securityService;
+        this.securityProperties = securityProperties;
+        this.cookieUtils = cookieUtils;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

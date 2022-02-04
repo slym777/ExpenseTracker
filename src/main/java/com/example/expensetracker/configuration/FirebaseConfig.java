@@ -1,4 +1,4 @@
-package com.example.expensetracker.config;
+package com.example.expensetracker.configuration;
 
 import com.example.expensetracker.auth.models.SecurityProperties;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -15,8 +15,12 @@ import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfig {
-    @Autowired
     SecurityProperties securityProperties;
+
+    @Autowired
+    public FirebaseConfig(SecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
+    }
 
     @Primary
     @Bean

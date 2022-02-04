@@ -1,10 +1,8 @@
 package com.example.expensetracker.service;
 
-import com.example.expensetracker.dtos.TripDto;
 import com.example.expensetracker.dtos.UserDto;
 import com.example.expensetracker.exception.ResourceExistsException;
 import com.example.expensetracker.exception.ResourceNotFoundException;
-import com.example.expensetracker.model.Trip;
 import com.example.expensetracker.model.User;
 import com.example.expensetracker.repository.UserRepository;
 import com.googlecode.jmapper.JMapper;
@@ -28,8 +26,10 @@ public class UserService {
                 UserDto.class, User.class
         );
 
-        var user = userRepository.findUserById(userId);
-        return userMapper.getDestination(user.get());
+        var user = userRepository.findUserById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User", "userId", userId)
+        );
+        return userMapper.getDestination(user);
     }
 
     public UserDto getUserByEmail(String userEmail) {
@@ -37,8 +37,11 @@ public class UserService {
                 UserDto.class, User.class
         );
 
-        var user = userRepository.findUserByEmail(userEmail);
-        return userMapper.getDestination(user.get());
+        var user = userRepository.findUserByEmail(userEmail).orElseThrow(
+                () -> new ResourceNotFoundException("User", "userEmail", userEmail)
+        );
+
+        return userMapper.getDestination(user);
     }
 
     public List<UserDto> getAllUsers(){
@@ -56,8 +59,8 @@ public class UserService {
 
         var user = userMapper.getDestination(userDto);
 
-        var dbUser = userRepository.findUserById(userId).orElseThrow( () ->
-                new ResourceNotFoundException("User", "userId", userId)
+        var dbUser = userRepository.findUserById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User", "userId", userId)
         );
 
         dbUser.setFullName(user.getFullName());
@@ -79,7 +82,7 @@ public class UserService {
 
         var checkUser = userRepository.findUserByEmail(user.getEmail());
         if (checkUser.isPresent()) {
-            throw new ResourceExistsException("User", "email", checkUser.get().getEmail());
+            throw new ResourceExistsException("User", "userEmail", checkUser.get().getEmail());
         }
 
         var savedUser = userRepository.save(user);

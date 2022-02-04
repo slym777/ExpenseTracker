@@ -26,11 +26,9 @@ public class Trip {
 
     private Integer groupSize;
 
-    //@JsonIgnore
     @ManyToMany(mappedBy = "trips", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private List<User> users = new ArrayList<>();
 
-    //@JsonIgnore
     @OneToMany(mappedBy = "trip", fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private List<Expense> expenses = new ArrayList<>();
 

@@ -1,6 +1,5 @@
 package com.example.expensetracker.service;
 
-
 import com.example.expensetracker.dtos.PushNotificationRequest;
 import com.example.expensetracker.model.PushNotificationParameter;
 import com.google.firebase.messaging.*;
@@ -54,5 +53,4 @@ public class FCMService {
                         .setBody(request.getMessage())
                         .build());
     }
-
 }

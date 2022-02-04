@@ -27,5 +27,4 @@ public class PushNotificationController {
         return ResponseEntity.ok().body(pushNotificationService.test(userId));
     }
 
-
 }

@@ -14,14 +14,18 @@ import javax.servlet.http.HttpServletRequest;
 
 @Service
 public class SecurityService {
-    @Autowired
     HttpServletRequest httpServletRequest;
 
-    @Autowired
     CookieUtils cookieUtils;
 
-    @Autowired
     SecurityProperties securityProperties;
+
+    @Autowired
+    public SecurityService(HttpServletRequest httpServletRequest, CookieUtils cookieUtils, SecurityProperties securityProperties) {
+        this.httpServletRequest = httpServletRequest;
+        this.cookieUtils = cookieUtils;
+        this.securityProperties = securityProperties;
+    }
 
     public UserPrincipal getUserPrincipal() {
         UserPrincipal userPrincipal = null;
