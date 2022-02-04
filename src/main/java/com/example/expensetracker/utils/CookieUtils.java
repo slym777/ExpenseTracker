@@ -1,6 +1,5 @@
 package com.example.expensetracker.utils;
 
-import com.example.expensetracker.auth.SecurityService;
 import com.example.expensetracker.auth.models.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,14 +11,18 @@ import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class CookieUtils {
-    @Autowired
-    private HttpServletRequest httpServletRequest;
+    private final HttpServletRequest httpServletRequest;
+
+    private final HttpServletResponse httpServletResponse;
+
+    private final SecurityProperties restSecurityProps;
 
     @Autowired
-    private HttpServletResponse httpServletResponse;
-
-    @Autowired
-    private SecurityProperties restSecurityProps;
+    public CookieUtils(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, SecurityProperties restSecurityProps) {
+        this.httpServletRequest = httpServletRequest;
+        this.httpServletResponse = httpServletResponse;
+        this.restSecurityProps = restSecurityProps;
+    }
 
     public Cookie getCookie(String name) {
         return WebUtils.getCookie(httpServletRequest, name);

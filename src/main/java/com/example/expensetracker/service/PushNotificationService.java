@@ -2,6 +2,7 @@ package com.example.expensetracker.service;
 
 import com.example.expensetracker.dtos.PushNotificationRequest;
 import com.example.expensetracker.exception.ResourceNotFoundException;
+import com.example.expensetracker.model.Expense;
 import com.example.expensetracker.model.PushNotification;
 import com.example.expensetracker.model.User;
 import com.example.expensetracker.repository.PushNotificationRepository;
@@ -11,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.Optional;
@@ -32,7 +32,6 @@ public class PushNotificationService {
     private final PushNotificationRepository notificationRepository;
 
     private final UserRepository userRepository;
-
 
     @Autowired
     public PushNotificationService(FCMService fcmService, PushNotificationRepository notificationRepository,
@@ -70,6 +69,14 @@ public class PushNotificationService {
 
     public void createAddUserToTripNotification(Long userId, String tripName) {
         String message = "You have been added to " + tripName;
+        String token = notificationRepository.getNotificationTokenByUserId(userId);
+        PushNotificationRequest request = createPushNotificationRequest(null, message, token);
+        this.sendPushNotificationToToken(request);
+    }
+
+    public void createAddExpenseForUserNotification(Long userId, Expense expense) {
+        var sizeGroup = expense.getCreditors().size();
+        String message = String.format("You have to pay %s to %s", expense.getAmount() / sizeGroup, expense.getDebtor().getFullName());
         String token = notificationRepository.getNotificationTokenByUserId(userId);
         PushNotificationRequest request = createPushNotificationRequest(null, message, token);
         this.sendPushNotificationToToken(request);

@@ -11,7 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface PushNotificationRepository extends JpaRepository<PushNotification, Long> {
-
     @Query(value = "update push_notification n set n.notification_token=:token where n.user_id=:userId ",
             nativeQuery = true)
     @Modifying
@@ -22,8 +21,5 @@ public interface PushNotificationRepository extends JpaRepository<PushNotificati
             nativeQuery = true)
     String getNotificationTokenByUserId(Long userId);
 
-
     Optional<PushNotification> findByUserId(Long userId);
-
-    Optional<PushNotification> findByNotificationToken(String notificationToken);
 }

@@ -28,12 +28,10 @@ public class Expense {
     @DecimalMin(value = "0.00", inclusive = false)
     private Double amount;
 
-    //@JsonIgnore
     @ManyToOne
     @JoinColumn(name = "debtor_id", nullable = false)
     private User debtor;
 
-    //@JsonIgnore
     @ManyToMany(mappedBy = "creditorExpenses", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     private List<User> creditors = new ArrayList<>();
 

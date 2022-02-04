@@ -2,7 +2,6 @@ package com.example.expensetracker.service;
 
 import com.example.expensetracker.dtos.CreateTripRequest;
 import com.example.expensetracker.dtos.ExpenseDto;
-import com.example.expensetracker.dtos.PushNotificationRequest;
 import com.example.expensetracker.dtos.TripDto;
 import com.example.expensetracker.exception.ResourceNotFoundException;
 import com.example.expensetracker.model.Expense;
@@ -27,10 +26,10 @@ import java.util.stream.Collectors;
 public class TripService {
 
     private final TripRepository tripRepository;
-    private ExpenseRepository expenseRepository;
-    private UserRepository userRepository;
-    private NotificationService notificationService;
-    private PushNotificationService pushNotificationService;
+    private final ExpenseRepository expenseRepository;
+    private final UserRepository userRepository;
+    private final NotificationService notificationService;
+    private final PushNotificationService pushNotificationService;
 
     @Autowired
     public TripService(TripRepository tripRepository, ExpenseRepository expenseRepository, UserRepository userRepository,
@@ -70,7 +69,7 @@ public class TripService {
         return tripsDto;
     }
 
-    public void SaveTrip(CreateTripRequest tripRequest)
+    public void saveTrip(CreateTripRequest tripRequest)
     {
         JMapper<Trip, CreateTripRequest> tripMapper= new JMapper<>(
                 Trip.class, CreateTripRequest.class);
@@ -87,13 +86,11 @@ public class TripService {
 
         users.forEach(us -> {
             pushNotificationService.createAddUserToTripNotification(us.getId(), trip.getName());
-            notificationService.CreateNotificationForTrip(us, trip);
+            notificationService.createNotificationForTrip(us, trip);
         });
     }
 
-    public TripDto UpdateTrip(Long tripId, TripDto tripDto) {
-        JMapper<TripDto, Trip> tripMapper= new JMapper<>(
-                TripDto.class, Trip.class);
+    public TripDto updateTrip(Long tripId, TripDto tripDto) {
         var trip = tripRepository.findTripById(tripId).orElseThrow(
                 () -> new ResourceNotFoundException("Trip", "tripId", tripId));
         if(!Helpers.IsNullOrEmpty(tripDto.getAvatarUri()) && tripDto.getAvatarUri() != trip.getAvatarUri()) trip.setAvatarUri(tripDto.getAvatarUri());
@@ -121,7 +118,7 @@ public class TripService {
             }
         }
 
-        toBeDeleted.forEach(user -> DeleteMember(tripId, user));
+        toBeDeleted.forEach(user -> deleteMember(tripId, user));
 
         List<User> toBeAdded = new ArrayList<>();
         for(var incomingUser: incomingUsers) {
@@ -138,19 +135,20 @@ public class TripService {
             }
         }
 
-        toBeAdded.forEach(user -> AddMember(tripId, user));
+        toBeAdded.forEach(user -> addMember(tripId, user));
 
         return getTripById(tripId);
     }
 
-    public TripDto AddMember(Long tripId, User user) {
+    public TripDto addMember(Long tripId, User user) {
         var trip = tripRepository.findTripById(tripId).orElseThrow(
                 () -> new ResourceNotFoundException("Trip", "tripId", tripId));
         trip.addUser(userRepository.findUserById(user.getId()).orElseThrow(
                 () -> new ResourceNotFoundException("User", "userId", user.getId())));
         var tripUpdated = tripRepository.save(trip);
 
-        notificationService.CreateNotificationForTrip(user, tripUpdated);
+        notificationService.createNotificationForTrip(user, tripUpdated);
+        pushNotificationService.createAddUserToTripNotification(user.getId(), tripUpdated.getName());
 
         JMapper<TripDto, Trip> tripMapperToDto= new JMapper<>(
                 TripDto.class, Trip.class);
@@ -158,7 +156,7 @@ public class TripService {
         return x;
     }
 
-    public TripDto DeleteMember(Long tripId, User userDto) {
+    public TripDto deleteMember(Long tripId, User userDto) {
         var trip = tripRepository.findTripById(tripId).orElseThrow(
                 () -> new ResourceNotFoundException("Trip", "tripId", tripId));
         var user = userRepository.findUserById(userDto.getId()).orElseThrow(
@@ -166,11 +164,13 @@ public class TripService {
         trip.removeUser(user);
         var tripUpdated = tripRepository.save(trip);
 
-        var expenses = new ArrayList<Expense>(trip.getExpenses().stream().filter(e -> e.getCreditors().contains(user) || e.getDebtor() == user).collect(Collectors.toList()));
+        var expenses = new ArrayList<>(trip.getExpenses().stream().filter(e -> e.getCreditors().contains(user) || e.getDebtor() == user).collect(Collectors.toList()));
         expenses.forEach(e -> {
             if(e.getDebtor() == user){
                 var creditors = new ArrayList<>(e.getCreditors());
-                creditors.forEach(us -> e.removeCreditor(userRepository.findUserById(us.getId()).get()));
+                creditors.forEach(us -> e.removeCreditor(userRepository.findUserById(us.getId()).orElseThrow(
+                        () -> new ResourceNotFoundException("User", "userId", us.getId())
+                )));
                 trip.getExpenses().remove(e);
                 expenseRepository.delete(e);
             }
@@ -186,7 +186,7 @@ public class TripService {
         return x;
     }
 
-    public TripDto AddExpense(Long tripId, ExpenseDto expenseDto) {
+    public TripDto addExpense(Long tripId, ExpenseDto expenseDto) {
         JMapper<Expense, ExpenseDto> expenseMapper= new JMapper<>(
                 Expense.class, ExpenseDto.class);
         JMapper<TripDto, Trip> tripMapper= new JMapper<>(
@@ -205,13 +205,22 @@ public class TripService {
 
         expense.setCreatedDate(Date.from(Instant.now()));
         expenseRepository.save(expense);
-        if(expense.getIsGroupExpense()) notificationService.CreateNotificationsForGroupExpense(expense);
+
+        if(expense.getIsGroupExpense()) {
+            notificationService.createNotificationsForGroupExpense(expense);
+
+            expense.getCreditors().forEach(user -> {
+                if (!user.equals(expense.getDebtor())) {
+                    pushNotificationService.createAddExpenseForUserNotification(user.getId(), expense);
+                }
+            });
+        }
 
         trip.getExpenses().add(expense);
         return tripMapper.getDestination(trip);
     }
 
-    public TripDto DeleteExpense(Long tripId, ExpenseDto expenseDto) {
+    public TripDto deleteExpense(Long tripId, ExpenseDto expenseDto) {
         JMapper<TripDto, Trip> tripMapper= new JMapper<>(
                 TripDto.class, Trip.class);
 
@@ -220,30 +229,31 @@ public class TripService {
         var expense = expenseRepository.findExpenseById(expenseDto.getId()).orElseThrow(
                 () -> new ResourceNotFoundException("Expense", "expenseId", expenseDto.getId()));
         expense.setTrip(trip);
-        RemoveCreditors(expense);
+        removeCreditors(expense);
         trip.getExpenses().remove(expense);
         expenseRepository.delete(expense);
         return tripMapper.getDestination(trip);
     }
 
-    public void DeleteTrip(Long tripId){
+    public void deleteTrip(Long tripId){
         var trip = tripRepository.findTripById(tripId).orElseThrow(
                 () -> new ResourceNotFoundException("Trip", "tripId", tripId));
         var members = trip.getUsers();
         var expenses = trip.getExpenses();
         members.forEach(m -> m.getTrips().remove(trip));
         expenses.forEach(e -> {
-            RemoveCreditors(e);
+            removeCreditors(e);
             expenseRepository.delete(e);
         });
-        notificationService.DeleteNotificationsForTrip(tripId);
+        notificationService.deleteNotificationsForTrip(tripId);
         tripRepository.delete(trip);
     }
 
-    private void RemoveCreditors(Expense expense)
+    private void removeCreditors(Expense expense)
     {
         var creditors = new ArrayList<>(expense.getCreditors());
-        creditors.forEach(us -> expense.removeCreditor(userRepository.findUserById(us.getId()).get()));
+        creditors.forEach(us -> expense.removeCreditor(userRepository.findUserById(us.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("User", "userId", us.getId())
+        )));
     }
-
 }

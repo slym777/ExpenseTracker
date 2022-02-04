@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -37,7 +36,7 @@ public class UserController {
 
     @GetMapping("/{userId}/getNotifications")
     public ResponseEntity<?> getNotificationForUser(@PathVariable Long userId) {
-        return ResponseEntity.ok().body(notificationService.GetNotificationsForUser(userId));
+        return ResponseEntity.ok().body(notificationService.getNotificationsForUser(userId));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -52,24 +51,4 @@ public class UserController {
         var updatedUserDto = userService.updateUser(userId, userDto);
         return new ResponseEntity<>(updatedUserDto, HttpStatus.OK);
     }
-
-// public ResponseEntity<?> getTripById(@PathVariable Long tripId){ return ResponseEntity.ok().body(tripService.getTripById(tripId)); }
-//
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
-//
-//    @PostMapping("/changePassword")
-//    public ResponseEntity updatePassword(@RequestBody ChangePasswordRequest changePasswordRequest, @CurrentUser UserPrincipal currentUser) {
-//        if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), currentUser.getPassword())){
-//            return new ResponseEntity(new ApiResponse(false, "Incorrect Password"),
-//                    HttpStatus.BAD_REQUEST);
-//        }
-//
-//        User user = userRepository.findUserById(currentUser.getId()).orElseThrow(
-//                () -> new ResourceNotFoundException("User", "userId", currentUser.getId()));
-//        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
-//        userRepository.save(user);
-//
-//        return new ResponseEntity(new ApiResponse(true, "Password updated successful"), HttpStatus.OK);
-//    }
 }

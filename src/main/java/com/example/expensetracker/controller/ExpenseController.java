@@ -22,7 +22,6 @@ public class ExpenseController {
         this.expenseService = expenseService;
     }
 
-
     @GetMapping("/test")
     public String testConnection() {
         return "Healthy expense API call!";
@@ -45,7 +44,7 @@ public class ExpenseController {
 
     @DeleteMapping("/delete/{expenseId}")
     public ResponseEntity<?> deleteExpense(@PathVariable Long expenseId) {
-        expenseService.DeleteExpense(expenseId);
+        expenseService.deleteExpense(expenseId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
